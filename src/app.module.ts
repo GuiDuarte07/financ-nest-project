@@ -6,9 +6,10 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [PrismaModule, UserModule, AuthModule],
+  imports: [ConfigModule.forRoot(), PrismaModule, UserModule, AuthModule],
   controllers: [AppController],
   providers: [
     AppService,
