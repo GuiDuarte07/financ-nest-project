@@ -7,23 +7,64 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class AccountService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createAccountDto: CreateAccountDto) {
-    return 'This action adds a new account';
+  create(createAccountDto: CreateAccountDto, userId: string) {
+    return this.prisma.account.create({
+      data: { ...createAccountDto, userId },
+      select: {
+        balance: true,
+        id: true,
+        bank: true,
+        color: true,
+        description: true,
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all account`;
+  findAll(userId: string) {
+    return this.prisma.account.findMany({
+      where: { userId },
+      select: {
+        balance: true,
+        id: true,
+        bank: true,
+        color: true,
+        description: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} account`;
+  findOne(id: string, userId: string) {
+    return this.prisma.account.findUnique({
+      where: { userId, id },
+      select: {
+        balance: true,
+        id: true,
+        bank: true,
+        color: true,
+        description: true,
+      },
+    });
   }
 
-  update(id: number, updateAccountDto: UpdateAccountDto) {
-    return `This action updates a #${id} account`;
+  update(id: string, updateAccountDto: UpdateAccountDto, userId: string) {
+    return this.prisma.account.update({
+      data: { ...updateAccountDto, userId },
+      where: { userId, id },
+      select: {
+        balance: true,
+        id: true,
+        bank: true,
+        color: true,
+        description: true,
+      },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} account`;
+  async remove(id: string, userId: string) {
+    await this.prisma.account.delete({
+      where: { userId, id },
+    });
+
+    return;
   }
 }

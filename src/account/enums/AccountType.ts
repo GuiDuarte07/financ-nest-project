@@ -1,5 +1,5 @@
 export enum AccountTypes {
-  current,
-  cash,
-  savings,
+  current = 'current',
+  cash = 'cash',
+  savings = 'savings',
 }

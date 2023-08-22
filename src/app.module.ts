@@ -10,7 +10,13 @@ import { ConfigModule } from '@nestjs/config';
 import { AccountModule } from './account/account.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), PrismaModule, UserModule, AuthModule, AccountModule],
+  imports: [
+    ConfigModule.forRoot(),
+    PrismaModule,
+    UserModule,
+    AuthModule,
+    AccountModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
