@@ -1,6 +1,7 @@
 import {
-  IsDate,
+  IsDateString,
   IsNumber,
+  IsOptional,
   IsString,
   IsUUID,
   MaxLength,
@@ -16,9 +17,17 @@ export class CreateExpenseDto {
   @IsNumber()
   value: number;
 
-  @IsDate()
+  @IsDateString()
+  @IsOptional()
   purchaseDate?: Date;
 
   @IsUUID()
   accountId: string;
+
+  @IsUUID()
+  categoryId: string;
+
+  @IsUUID()
+  @IsOptional()
+  recorrenceId: string;
 }

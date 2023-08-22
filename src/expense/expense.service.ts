@@ -9,12 +9,21 @@ export class ExpenseService {
 
   create(createExpenseDto: CreateExpenseDto, userId: string) {
     return this.prisma.expense.create({
-      data: { ...createExpenseDto, userId, categoryId: 'need to Do' },
+      data: {
+        ...createExpenseDto,
+        purchaseDate: createExpenseDto.purchaseDate ?? new Date(),
+        userId,
+      },
     });
   }
 
-  findAll(userId: string, startDate?: Date, endDate?: Date) {
-    if (!startDate) {
+  findAll(
+    userId: string,
+    startDate?: Date,
+    endDate?: Date,
+    accountId?: string,
+  ) {
+    /* if (!startDate) {
       const currentDate = new Date();
       startDate = new Date(
         currentDate.getFullYear(),
@@ -24,14 +33,36 @@ export class ExpenseService {
     }
     if (!endDate) {
       endDate = new Date();
-    }
+    } */
 
     return this.prisma.expense.findMany({
       where: {
-        purchaseDate: {
-          gte: startDate,
-          lte: endDate,
-        },
+        // startDate e endDate: retorna tudo nesse range
+        ...(startDate &&
+          endDate && {
+            purchaseDate: {
+              gte: startDate,
+              lte: endDate,
+            },
+          }),
+
+        // Apenas startDate: retorna tudo dessa data até agora
+        ...(startDate &&
+          !endDate && {
+            purchaseDate: {
+              gte: startDate,
+            },
+          }),
+
+        // Apenas endDate: retorna tudo até essa data
+        ...(!startDate &&
+          endDate && {
+            purchaseDate: {
+              lte: endDate,
+            },
+          }),
+        // Se nem startDate e endDate, retorna tudo
+        ...(accountId && { accountId }),
         userId,
       },
     });
