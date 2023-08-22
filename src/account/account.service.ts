@@ -34,7 +34,7 @@ export class AccountService {
   }
 
   findOne(id: string, userId: string) {
-    return this.prisma.account.findUnique({
+    return this.prisma.account.findUniqueOrThrow({
       where: { userId, id },
       select: {
         balance: true,
