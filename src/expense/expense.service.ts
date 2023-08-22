@@ -13,19 +13,42 @@ export class ExpenseService {
     });
   }
 
-  findAll() {
-    return `This action returns all expense`;
+  findAll(userId: string, startDate?: Date, endDate?: Date) {
+    if (!startDate) {
+      const currentDate = new Date();
+      startDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        1,
+      );
+    }
+    if (!endDate) {
+      endDate = new Date();
+    }
+
+    return this.prisma.expense.findMany({
+      where: {
+        purchaseDate: {
+          gte: startDate,
+          lte: endDate,
+        },
+        userId,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} expense`;
+  findOne(id: string, userId: string) {
+    return this.prisma.expense.findUniqueOrThrow({ where: { id, userId } });
   }
 
-  update(id: number, updateExpenseDto: UpdateExpenseDto) {
-    return `This action updates a #${id} ${updateExpenseDto} expense`;
+  update(id: string, updateExpenseDto: UpdateExpenseDto, userId: string) {
+    return this.prisma.expense.update({
+      data: { ...updateExpenseDto, userId },
+      where: { id, userId },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} expense`;
+  remove(id: string, userId: string) {
+    return this.prisma.expense.delete({ where: { id, userId } });
   }
 }
