@@ -19,6 +19,8 @@ export class CreateUserDto extends User {
   })
   password: string;
 
+  emailConfirmed?: boolean;
+
   @IsString()
   name: string;
 }
