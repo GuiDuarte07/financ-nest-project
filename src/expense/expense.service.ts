@@ -1,11 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ExpenseService {
-  create(createExpenseDto: CreateExpenseDto) {
-    return 'This action adds a new expense';
+  constructor(private readonly prisma: PrismaService) {}
+
+  create(createExpenseDto: CreateExpenseDto, userId: string) {
+    return this.prisma.expense.create({
+      data: { ...createExpenseDto, userId, categoryId: 'need to Do' },
+    });
   }
 
   findAll() {

@@ -1,14 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ExpenseService } from './expense.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { IUserPayload } from 'src/user/interfaces/user';
 
 @Controller('expense')
 export class ExpenseController {
   constructor(private readonly expenseService: ExpenseService) {}
 
   @Post()
-  create(@Body() createExpenseDto: CreateExpenseDto) {
+  create(
+    @Body() createExpenseDto: CreateExpenseDto,
+    @CurrentUser() user: IUserPayload,
+  ) {
     return this.expenseService.create(createExpenseDto);
   }
 
