@@ -22,7 +22,7 @@ export class ExpenseService {
   }
 
   update(id: number, updateExpenseDto: UpdateExpenseDto) {
-    return `This action updates a #${id} expense`;
+    return `This action updates a #${id} ${updateExpenseDto} expense`;
   }
 
   remove(id: number) {

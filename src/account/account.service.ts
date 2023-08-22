@@ -9,7 +9,11 @@ export class AccountService {
 
   create(createAccountDto: CreateAccountDto, userId: string) {
     return this.prisma.account.create({
-      data: { ...createAccountDto, userId },
+      data: {
+        ...createAccountDto,
+        userId,
+        initialBalance: createAccountDto.balance,
+      },
       select: {
         balance: true,
         id: true,
