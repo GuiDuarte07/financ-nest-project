@@ -10,7 +10,7 @@ generator client {
 model User {
   id String @id @default(uuid())
 
-  email          String  @unique
+  email          String   @unique
   emailConfirmed Boolean? @default(false)
 
   password String
@@ -20,12 +20,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  categories            Category[]
-  accounts              Account[]
-  creditCards           CreditCard[]
-  expenses              Expense[]
-  creditCardTransaction CreditCardTransaction[]
-  cashTransaction       CashTransaction[]
+  categories         Category[]
+  accounts           Account[]
+  creditCards        CreditCard[]
+  expenses           Expense[]
+  creditCardExpenses CreditCardExpense[]
 }
 
 model Account {
@@ -41,10 +40,10 @@ model Account {
 
   creditCards CreditCard[]
 
-  user            User              @relation(fields: [userId], references: [id])
-  userId          String
-  cashTransaction CashTransaction[]
-  Income          Income[]
+  user     User      @relation(fields: [userId], references: [id])
+  userId   String
+  expesnes Expense[]
+  Income   Income[]
 }
 
 model CreditCard {
@@ -67,7 +66,7 @@ model CreditCard {
   user   User   @relation(fields: [userId], references: [id])
   userId String
 
-  creditCardTransaction CreditCardTransaction?
+  creditCardExpenses CreditCardExpense[]
 }
 
 model Category {
@@ -88,10 +87,11 @@ model Category {
 }
 
 model Expense {
-  id            String  @id @default(uuid())
+  id            String   @id @default(uuid())
+  description   String
   value         Float
-  justForRecord Boolean @default(false) //Apenas para registro
-  paymentMethod String //PaymentMethod
+  purchaseDate  DateTime @default(now())
+  justForRecord Boolean  @default(false) //Apenas para registro
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -102,43 +102,25 @@ model Expense {
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId String
 
-  creditCardTransaction CreditCardTransaction?
-  cashTransaction       CashTransaction?
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId String
 }
 
-model CreditCardTransaction {
-  id           String   @id @default(uuid())
-  name         String
-  installment  Int
-  purchaseDate DateTime @default(now())
-  invoiceDate  DateTime @default(now())
+model CreditCardExpense {
+  id            String   @id @default(uuid())
+  name          String
+  justForRecord Boolean  @default(false) //Apenas para registro
+  value         Float
+  installment   Int //Quantidade de parcelas
+  purchaseDate  DateTime @default(now()) //Data da compra
+  invoiceDate   DateTime @default(now()) //Data de inicio do pagamento da fatura
+  paymentEndDate DateTime //Data do fim da fatura
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  expense   Expense @relation(fields: [expenseId], references: [id])
-  expenseId String  @unique
 
   creditCard   CreditCard @relation(fields: [creditCardId], references: [id])
   creditCardId String     @unique
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-}
-
-model CashTransaction {
-  id           String   @id @default(uuid())
-  name         String
-  purchaseDate DateTime @default(now())
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  expense   Expense @relation(fields: [expenseId], references: [id])
-  expenseId String  @unique
-
-  account   Account @relation(fields: [accountId], references: [id])
-  accountId String  @unique
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
