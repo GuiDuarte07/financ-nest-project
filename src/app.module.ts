@@ -11,6 +11,7 @@ import { AccountModule } from './account/account.module';
 import { APP_FILTER } from '@nestjs/core';
 import { PrismaExceptionFilter } from './prisma/ExceptionFilters/PrismaClientKnownRequestError';
 import { CreditCardModule } from './credit-card/credit-card.module';
+import { ExpenseModule } from './expense/expense.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { CreditCardModule } from './credit-card/credit-card.module';
     AuthModule,
     AccountModule,
     CreditCardModule,
+    ExpenseModule,
   ],
   controllers: [AppController],
   providers: [

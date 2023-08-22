@@ -28,12 +28,13 @@ model User {
 }
 
 model Account {
-  id          String  @id @default(uuid())
-  balance     Float
-  description String
-  bank        String
-  color       String?
-  type        String //AccountTypes
+  id             String  @id @default(uuid())
+  balance        Float
+  initialBalance Float
+  description    String
+  bank           String
+  color          String?
+  type           String //AccountTypes
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -42,7 +43,7 @@ model Account {
 
   user     User      @relation(fields: [userId], references: [id])
   userId   String
-  expesnes Expense[]
+  expenses Expense[]
   Income   Income[]
 }
 
@@ -51,7 +52,6 @@ model CreditCard {
   limit       Int
   description String
   cardBrand   String
-
   account   Account @relation(fields: [accountId], references: [id])
   accountId String
 
@@ -87,11 +87,13 @@ model Category {
 }
 
 model Expense {
-  id            String   @id @default(uuid())
+  id            String                  @id @default(uuid())
   description   String
   value         Float
-  purchaseDate  DateTime @default(now())
-  justForRecord Boolean  @default(false) //Apenas para registro
+  purchaseDate  DateTime                @default(now())
+  justForRecord Boolean                 @default(false) //Apenas para registro
+  recorrence    RecorrenceBillsProcess? @relation(fields: [recorrenceId], references: [id])
+  recorrenceId  String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -107,13 +109,13 @@ model Expense {
 }
 
 model CreditCardExpense {
-  id            String   @id @default(uuid())
-  name          String
-  justForRecord Boolean  @default(false) //Apenas para registro
-  value         Float
-  installment   Int //Quantidade de parcelas
-  purchaseDate  DateTime @default(now()) //Data da compra
-  invoiceDate   DateTime @default(now()) //Data de inicio do pagamento da fatura
+  id             String   @id @default(uuid())
+  name           String
+  justForRecord  Boolean  @default(false) //Apenas para registro
+  value          Float
+  installment    Int //Quantidade de parcelas
+  purchaseDate   DateTime @default(now()) //Data da compra
+  invoiceDate    DateTime @default(now()) //Data de inicio do pagamento da fatura
   paymentEndDate DateTime //Data do fim da fatura
 
   createdAt DateTime @default(now())
@@ -133,6 +135,9 @@ model Income {
   description   String? // Nome ou descrição para a entrada
   justForRecord Boolean  @default(false) //Apenas para registro
 
+  recorrence   RecorrenceBillsProcess? @relation(fields: [recorrenceId], references: [id])
+  recorrenceId String?
+
   category    Category? @relation(fields: [category_id], references: [id])
   category_id String?
   account     Account   @relation(fields: [account_id], references: [id])
@@ -146,11 +151,15 @@ model RecorrenceBillsProcess {
   value                Float
   stopCount            Boolean @default(false)
   paymentRecurrence    String //Recurrence  Recorrência do pagamento
-  dayOfPayment         Int // Dia do pagamento (se aplicável)
+  monthlyDayOfPayment  Int? // Se for mensal Dia do pagamento (se aplicável)
+  weeklyDay            String? //Dia da semana, caso for semanal
+  countNumber          Int     @default(0)
   rememberDayOfPayment Boolean // Se deve lembrar o dia do pagamento (se aplicável)
   type                 String //ExpeInco
 
-  startDate DateTime @default(now())
+  startDate DateTime  @default(now())
+  Expense   Expense[]
+  Income    Income[]
 }
 
 // enum Recurrence {
