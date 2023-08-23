@@ -3,6 +3,16 @@ import { CreateIncomeDto } from './dto/create-income.dto';
 import { UpdateIncomeDto } from './dto/update-income.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+const select = {
+  accountId: true,
+  categoryId: true,
+  description: true,
+  value: true,
+  id: true,
+  receivedAt: true,
+  recorrenceId: true,
+};
+
 @Injectable()
 export class IncomeService {
   constructor(private readonly prisma: PrismaService) {}
@@ -14,6 +24,7 @@ export class IncomeService {
         receivedAt: createIncomeDto.receivedAt ?? new Date(),
         userId,
       },
+      select,
     });
   }
 
@@ -23,18 +34,6 @@ export class IncomeService {
     endDate?: Date,
     accountId?: string,
   ) {
-    /* if (!startDate) {
-      const currentDate = new Date();
-      startDate = new Date(
-        currentDate.getFullYear(),
-        currentDate.getMonth(),
-        1,
-      );
-    }
-    if (!endDate) {
-      endDate = new Date();
-    } */
-
     return this.prisma.income.findMany({
       where: {
         // startDate e endDate: retorna tudo nesse range
@@ -65,6 +64,7 @@ export class IncomeService {
         ...(accountId && { accountId }),
         userId,
       },
+      select,
     });
   }
 
@@ -76,10 +76,11 @@ export class IncomeService {
     return this.prisma.income.update({
       data: { ...updateIncomeDto },
       where: { id, userId },
+      select,
     });
   }
 
-  remove(id: string, userId: string) {
-    return this.prisma.income.delete({ where: { id, userId } });
+  async remove(id: string, userId: string) {
+    await this.prisma.income.delete({ where: { id, userId } });
   }
 }
