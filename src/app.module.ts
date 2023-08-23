@@ -13,6 +13,7 @@ import { PrismaExceptionFilter } from './prisma/ExceptionFilters/PrismaClientKno
 import { CreditCardModule } from './credit-card/credit-card.module';
 import { ExpenseModule } from './expense/expense.module';
 import { CategoryModule } from './category/category.module';
+import { IncomeModule } from './income/income.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { CategoryModule } from './category/category.module';
     AccountModule,
     CreditCardModule,
     ExpenseModule,
+    IncomeModule,
     CategoryModule,
   ],
   controllers: [AppController],
