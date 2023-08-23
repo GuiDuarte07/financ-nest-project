@@ -14,6 +14,7 @@ import { CreditCardModule } from './credit-card/credit-card.module';
 import { ExpenseModule } from './expense/expense.module';
 import { CategoryModule } from './category/category.module';
 import { IncomeModule } from './income/income.module';
+import { CreditCardExpenseModule } from './credit-card-expense/credit-card-expense.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { IncomeModule } from './income/income.module';
     ExpenseModule,
     IncomeModule,
     CategoryModule,
+    CreditCardExpenseModule,
   ],
   controllers: [AppController],
   providers: [

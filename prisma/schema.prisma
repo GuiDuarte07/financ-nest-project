@@ -123,7 +123,7 @@ model CreditCardExpense {
   updatedAt DateTime @updatedAt
 
   creditCard   CreditCard @relation(fields: [creditCardId], references: [id])
-  creditCardId String     @unique
+  creditCardId String
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
