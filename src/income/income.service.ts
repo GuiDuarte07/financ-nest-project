@@ -11,6 +11,7 @@ const select = {
   id: true,
   receivedAt: true,
   recorrenceId: true,
+  justForRecord: true,
 };
 
 @Injectable()

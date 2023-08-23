@@ -3,6 +3,17 @@ import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+const select = {
+  accountId: true,
+  categoryId: true,
+  description: true,
+  id: true,
+  value: true,
+  justForRecord: true,
+  recorrenceId: true,
+  purchaseDate: true,
+};
+
 @Injectable()
 export class ExpenseService {
   constructor(private readonly prisma: PrismaService) {}
@@ -14,6 +25,7 @@ export class ExpenseService {
         purchaseDate: createExpenseDto.purchaseDate ?? new Date(),
         userId,
       },
+      select,
     });
   }
 
@@ -74,7 +86,7 @@ export class ExpenseService {
 
   update(id: string, updateExpenseDto: UpdateExpenseDto, userId: string) {
     return this.prisma.expense.update({
-      data: { ...updateExpenseDto, userId },
+      data: { ...updateExpenseDto },
       where: { id, userId },
     });
   }
