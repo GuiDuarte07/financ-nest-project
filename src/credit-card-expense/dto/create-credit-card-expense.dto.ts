@@ -20,9 +20,10 @@ export class CreateCreditCardExpenseDto {
 
   @IsNumber()
   @IsPositive()
-  value: number;
+  totalValue: number;
 
   @IsInt()
+  @IsPositive()
   @Max(25)
   installment: number; //parcelas
 

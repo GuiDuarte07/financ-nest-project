@@ -11,7 +11,9 @@ describe('CreditCardExpenseController', () => {
       providers: [CreditCardExpenseService],
     }).compile();
 
-    controller = module.get<CreditCardExpenseController>(CreditCardExpenseController);
+    controller = module.get<CreditCardExpenseController>(
+      CreditCardExpenseController,
+    );
   });
 
   it('should be defined', () => {

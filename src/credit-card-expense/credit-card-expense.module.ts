@@ -4,8 +4,8 @@ import { CreditCardExpenseController } from './credit-card-expense.controller';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Module({
-  imports: [PrismaService],
+  imports: [],
   controllers: [CreditCardExpenseController],
-  providers: [CreditCardExpenseService],
+  providers: [CreditCardExpenseService, PrismaService],
 })
 export class CreditCardExpenseModule {}

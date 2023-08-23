@@ -16,4 +16,8 @@ export class FindCreditCardExpenseDTO {
   @IsBoolean()
   @IsOptional()
   justForRecord?: boolean;
+
+  @IsUUID()
+  @IsOptional()
+  creditCardExpenseGeneratorId?: string;
 }

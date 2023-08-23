@@ -49,6 +49,11 @@ export class CreditCardExpenseController {
     return this.creditCardExpenseService.findOne(id, user.id);
   }
 
+  @Get('/generator/:id')
+  findGenerator(@Param('id') id: string, @CurrentUser() user: IUserPayload) {
+    return this.creditCardExpenseService.findGenerator(id, user.id);
+  }
+
   @Patch(':id')
   update(
     @Param('id') id: string,

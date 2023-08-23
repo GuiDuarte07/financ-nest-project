@@ -28,7 +28,7 @@ export class PrismaExceptionFilter implements ExceptionFilter {
       // Adicione mais casos para outros códigos de erro do Prisma
     }
 
-    console.log(exception.code);
+    console.log(exception.code, exception);
 
     response.status(status).json({
       statusCode: status,

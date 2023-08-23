@@ -20,12 +20,13 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  categories         Category[]
-  accounts           Account[]
-  creditCards        CreditCard[]
-  expenses           Expense[]
-  creditCardExpenses CreditCardExpense[]
-  Income             Income[]
+  categories                 Category[]
+  accounts                   Account[]
+  creditCards                CreditCard[]
+  expenses                   Expense[]
+  creditCardExpenses         CreditCardExpense[]
+  Income                     Income[]
+  CreditCardExpenseGenerator CreditCardExpenseGenerator[]
 }
 
 model Account {
@@ -67,7 +68,8 @@ model CreditCard {
   user   User   @relation(fields: [userId], references: [id])
   userId String
 
-  creditCardExpenses CreditCardExpense[]
+  creditCardExpenses         CreditCardExpense[]
+  CreditCardExpenseGenerator CreditCardExpenseGenerator[]
 }
 
 model Category {
@@ -109,11 +111,11 @@ model Expense {
   accountId String
 }
 
-model CreditCardExpense {
+model CreditCardExpenseGenerator {
   id             String   @id @default(uuid())
   name           String
   justForRecord  Boolean  @default(false) //Apenas para registro
-  value          Float
+  totalValue     Float
   installment    Int //Quantidade de parcelas
   purchaseDate   DateTime @default(now()) //Data da compra
   invoiceDate    DateTime @default(now()) //Data de inicio do pagamento da fatura
@@ -124,6 +126,28 @@ model CreditCardExpense {
 
   creditCard   CreditCard @relation(fields: [creditCardId], references: [id])
   creditCardId String
+
+  user              User                @relation(fields: [userId], references: [id])
+  userId            String
+  CreditCardExpense CreditCardExpense[]
+}
+
+model CreditCardExpense {
+  id             String   @id @default(uuid())
+  name           String
+  justForRecord  Boolean  @default(false) //Apenas para registro
+  value          Float
+  paidOut        Boolean  @default(false)
+  invoiceDate    DateTime @default(now()) //Data de inicio do pagamento da fatura
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  creditCardExpenseGenerator   CreditCardExpenseGenerator @relation(fields: [creditCardExpenseGeneratorId], references: [id])
+  creditCardExpenseGeneratorId String
+
+  CreditCard   CreditCard? @relation(fields: [creditCardId], references: [id])
+  creditCardId String?
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
@@ -139,11 +163,11 @@ model Income {
   recorrence   RecorrenceBillsProcess? @relation(fields: [recorrenceId], references: [id])
   recorrenceId String?
 
-  category    Category? @relation(fields: [categoryId], references: [id])
+  category   Category? @relation(fields: [categoryId], references: [id])
   categoryId String
-  account     Account   @relation(fields: [accountId], references: [id])
+  account    Account   @relation(fields: [accountId], references: [id])
   accountId  String
-  createdAt   DateTime  @default(now())
+  createdAt  DateTime  @default(now())
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
