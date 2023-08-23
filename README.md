@@ -13,10 +13,10 @@
   - [x] Criar um novo cartão de crédito
   - [x] Editar um cartão de crédito
   - [x] Excluir um cartão de crédito
-- [ ] Lidar com valores de receitas para a conta
-  - [ ] poder inserir valores de receitas para a conta
-  - [ ] poder editar valores de receitas para a conta
-  - [ ] poder excluir valores de despesas para a conta
+- [x] Lidar com valores de receitas para a conta
+  - [x] poder inserir valores de receitas para a conta
+  - [x] poder editar valores de receitas para a conta
+  - [x] poder excluir valores de despesas para a conta
 - [ ] Lidar com compras de cartão que podem ser parceladas
   - [ ] poder inserir compras de cartão que podem ser parceladas
   - [ ] poder editar compras de cartão que podem ser parceladas
@@ -25,11 +25,11 @@
   - [ ] Poder criar despesas/receitas recorrentes
   - [ ] Poder encerrar despesas/receitas recorrentes
 - [ ] Gerar categorias padrões para novos usuários
-- [ ] Criar novas categorias
+- [x] Criar novas categorias
 
 ### Gets
 - [x] Ver dados do usuário
-- [ ] Ver total das contas
-- [ ] Ver gastos do mês
-- [ ] Ver ganhos do mês
-- [ ] Ver as categorias
+- [x] Ver total das contas
+- [x] Ver gastos do mês
+- [x] Ver ganhos do mês
+- [x] Ver as categorias
