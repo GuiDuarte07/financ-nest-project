@@ -5,7 +5,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
 @Catch(PrismaClientKnownRequestError)
 export class PrismaExceptionFilter implements ExceptionFilter {
@@ -28,7 +28,7 @@ export class PrismaExceptionFilter implements ExceptionFilter {
       // Adicione mais casos para outros códigos de erro do Prisma
     }
 
-    console.log(exception.code, exception);
+    console.log(ctx.getRequest<Request>().path, exception.code, exception);
 
     response.status(status).json({
       statusCode: status,

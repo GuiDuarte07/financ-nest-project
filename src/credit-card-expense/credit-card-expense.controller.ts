@@ -31,6 +31,16 @@ export class CreditCardExpenseController {
     );
   }
 
+  @Get('generator')
+  findAllGenerator(@CurrentUser() user: IUserPayload) {
+    return this.creditCardExpenseService.findAllGenerator(user.id);
+  }
+
+  @Get('/generator/:id')
+  findGenerator(@Param('id') id: string, @CurrentUser() user: IUserPayload) {
+    return this.creditCardExpenseService.findGenerator(id, user.id);
+  }
+
   @Get()
   findAll(
     @Body() findCreditCardExpenseDTO: FindCreditCardExpenseDTO,
@@ -47,11 +57,6 @@ export class CreditCardExpenseController {
   @Get(':id')
   findOne(@Param('id') id: string, @CurrentUser() user: IUserPayload) {
     return this.creditCardExpenseService.findOne(id, user.id);
-  }
-
-  @Get('/generator/:id')
-  findGenerator(@Param('id') id: string, @CurrentUser() user: IUserPayload) {
-    return this.creditCardExpenseService.findGenerator(id, user.id);
   }
 
   @Patch(':id')

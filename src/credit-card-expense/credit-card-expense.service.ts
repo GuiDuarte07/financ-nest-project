@@ -96,6 +96,12 @@ export class CreditCardExpenseService {
     });
   }
 
+  findAllGenerator(userId: string) {
+    return this.prisma.creditCardExpenseGenerator.findMany({
+      where: { userId },
+    });
+  }
+
   findGenerator(creditCardExpenseGeneratorId: string, userId: string) {
     return this.prisma.creditCardExpenseGenerator.findFirstOrThrow({
       where: { id: creditCardExpenseGeneratorId, userId },
