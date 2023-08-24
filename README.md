@@ -17,10 +17,12 @@
   - [x] poder inserir valores de receitas para a conta
   - [x] poder editar valores de receitas para a conta
   - [x] poder excluir valores de despesas para a conta
-- [x] Lidar com compras de cartão que podem ser parceladas
+- [ ] Lidar com compras de cartão que podem ser parceladas
   - [x] poder inserir compras de cartão que podem ser parceladas
   - [x] poder editar compras de cartão que podem ser parceladas
   - [x] poder excluir compras de cartão que podem ser parceladas
+  - [ ] poder pagar a fatura do mês ou de parcelas individuais
+  - [ ] poder adiantar parcelas e anotar o ganho nessa operação
 - [ ] Lidar com despesas/receitas recorrentes
   - [ ] Poder criar despesas/receitas recorrentes
   - [ ] Poder encerrar despesas/receitas recorrentes
@@ -33,3 +35,6 @@
 - [x] Ver gastos do mês
 - [x] Ver ganhos do mês
 - [x] Ver as categorias
+- [ ] Ver um resumo do usuário, de quanto tem em conta, e quanto falta pagar
+- [ ] Ver gasto por categoria
+- [ ] Ver gastos por cartão de crédito
