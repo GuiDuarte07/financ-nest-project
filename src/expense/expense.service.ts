@@ -18,8 +18,8 @@ const select = {
 export class ExpenseService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createExpenseDto: CreateExpenseDto, userId: string) {
-    return this.prisma.expense.create({
+  async create(createExpenseDto: CreateExpenseDto, userId: string) {
+    const expense = await this.prisma.expense.create({
       data: {
         ...createExpenseDto,
         purchaseDate: createExpenseDto.purchaseDate ?? new Date(),
@@ -27,6 +27,19 @@ export class ExpenseService {
       },
       select,
     });
+
+    if (!createExpenseDto.justForRecord) {
+      await this.prisma.account.update({
+        where: { id: createExpenseDto.accountId, userId },
+        data: {
+          balance: {
+            decrement: createExpenseDto.value,
+          },
+        },
+      });
+    }
+
+    return expense;
   }
 
   findAll(
@@ -84,14 +97,45 @@ export class ExpenseService {
     return this.prisma.expense.findUniqueOrThrow({ where: { id, userId } });
   }
 
-  update(id: string, updateExpenseDto: UpdateExpenseDto, userId: string) {
-    return this.prisma.expense.update({
-      data: { ...updateExpenseDto },
+  async update(id: string, updateExpenseDto: UpdateExpenseDto, userId: string) {
+    const oldExpense = await this.prisma.expense.findFirstOrThrow({
       where: { id, userId },
+      select: { value: true, accountId: true },
     });
+
+    const expenseDifference = oldExpense.value - updateExpenseDto.value;
+
+    const [updatedExpense] = await this.prisma.$transaction([
+      this.prisma.expense.update({
+        data: { ...updateExpenseDto },
+        where: { id, userId },
+        select,
+      }),
+      this.prisma.account.update({
+        where: { id: oldExpense.accountId },
+        data: {
+          balance: {
+            increment: expenseDifference,
+          },
+        },
+      }),
+    ]);
+
+    return updatedExpense;
   }
 
-  remove(id: string, userId: string) {
-    return this.prisma.expense.delete({ where: { id, userId } });
+  async remove(id: string, userId: string) {
+    const deletedExpense = await this.prisma.expense.delete({
+      where: { id, userId },
+    });
+
+    await this.prisma.account.update({
+      where: { id: deletedExpense.accountId, userId },
+      data: {
+        balance: {
+          increment: deletedExpense.value,
+        },
+      },
+    });
   }
 }

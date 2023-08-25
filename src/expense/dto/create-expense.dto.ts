@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsDateString,
   IsNumber,
   IsOptional,
@@ -17,17 +18,21 @@ export class CreateExpenseDto {
   @IsNumber()
   value: number;
 
-  @IsDateString()
-  @IsOptional()
-  purchaseDate?: Date;
-
   @IsUUID()
   accountId: string;
 
   @IsUUID()
   categoryId: string;
 
-  @IsUUID()
   @IsOptional()
+  @IsUUID()
   recorrenceId: string;
+
+  @IsOptional()
+  @IsBoolean()
+  justForRecord?: boolean;
+
+  @IsOptional()
+  @IsDateString()
+  purchaseDate?: Date;
 }
