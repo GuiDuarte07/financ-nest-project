@@ -135,15 +135,15 @@ model CreditCardExpenseGenerator {
 }
 
 model CreditCardExpense {
-  id            String   @id @default(uuid())
-  name          String
-  justForRecord Boolean  @default(false) //Apenas para registro
-  value         Float
-  paidOut       Boolean  @default(false)
-  anticipated   Boolean  @default(false)
-  invoiceDate   DateTime @default(now()) //Data de inicio do pagamento da fatura
-  //installmentNumber Int
-  //totalInstallmentNumber Int 
+  id                     String   @id @default(uuid())
+  name                   String
+  justForRecord          Boolean  @default(false) //Apenas para registro
+  value                  Float
+  paidOut                Boolean  @default(false)
+  anticipated            Boolean  @default(false)
+  invoiceDate            DateTime @default(now()) //Data de inicio do pagamento da fatura
+  installmentNumber      Int
+  totalInstallmentNumber Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
