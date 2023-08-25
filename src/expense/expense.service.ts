@@ -18,30 +18,6 @@ const select = {
 export class ExpenseService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createExpenseDto: CreateExpenseDto, userId: string) {
-    const expense = await this.prisma.expense.create({
-      data: {
-        ...createExpenseDto,
-        purchaseDate: createExpenseDto.purchaseDate ?? new Date(),
-        userId,
-      },
-      select,
-    });
-
-    if (!createExpenseDto.justForRecord) {
-      await this.prisma.account.update({
-        where: { id: createExpenseDto.accountId, userId },
-        data: {
-          balance: {
-            decrement: createExpenseDto.value,
-          },
-        },
-      });
-    }
-
-    return expense;
-  }
-
   findAll(
     userId: string,
     startDate?: Date,
@@ -97,13 +73,39 @@ export class ExpenseService {
     return this.prisma.expense.findUniqueOrThrow({ where: { id, userId } });
   }
 
+  async create(createExpenseDto: CreateExpenseDto, userId: string) {
+    const expense = await this.prisma.expense.create({
+      data: {
+        ...createExpenseDto,
+        purchaseDate: createExpenseDto.purchaseDate ?? new Date(),
+        userId,
+      },
+      select,
+    });
+
+    if (!createExpenseDto.justForRecord) {
+      await this.prisma.account.update({
+        where: { id: createExpenseDto.accountId, userId },
+        data: {
+          balance: {
+            decrement: createExpenseDto.value,
+          },
+        },
+      });
+    }
+
+    return expense;
+  }
+
   async update(id: string, updateExpenseDto: UpdateExpenseDto, userId: string) {
+    const { value, accountId } = updateExpenseDto;
+
     const oldExpense = await this.prisma.expense.findFirstOrThrow({
       where: { id, userId },
       select: { value: true, accountId: true },
     });
 
-    const expenseDifference = oldExpense.value - updateExpenseDto.value;
+    const expenseDifference = oldExpense.value - value;
 
     const [updatedExpense] = await this.prisma.$transaction([
       this.prisma.expense.update({
@@ -112,13 +114,26 @@ export class ExpenseService {
         select,
       }),
       this.prisma.account.update({
-        where: { id: oldExpense.accountId },
+        where: { id: accountId || oldExpense.accountId },
         data: {
           balance: {
-            increment: expenseDifference,
+            increment:
+              accountId && accountId !== oldExpense.accountId
+                ? -value
+                : expenseDifference,
           },
         },
       }),
+      accountId &&
+        accountId !== oldExpense.accountId &&
+        this.prisma.account.update({
+          where: { id: oldExpense.accountId, userId },
+          data: {
+            balance: {
+              decrement: value,
+            },
+          },
+        }),
     ]);
 
     return updatedExpense;

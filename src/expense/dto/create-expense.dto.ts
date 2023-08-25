@@ -25,10 +25,6 @@ export class CreateExpenseDto {
   categoryId: string;
 
   @IsOptional()
-  @IsUUID()
-  recorrenceId: string;
-
-  @IsOptional()
   @IsBoolean()
   justForRecord?: boolean;
 
