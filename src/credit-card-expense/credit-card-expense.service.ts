@@ -315,6 +315,8 @@ export class CreditCardExpenseService {
           justForRecord,
           userId,
           paidOut: numberOfInstallmentsPaid >= i + 1 ? true : false,
+          installmentNumber: i + 1,
+          totalInstallmentNumber: installment,
         },
       });
     }
