@@ -13,6 +13,7 @@ import { UpdateCreditCardExpenseDto } from './dto/update-credit-card-expense.dto
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { IUserPayload } from 'src/user/interfaces/user';
 import { FindCreditCardExpenseDTO } from './dto/find-credit-card-expense.dto';
+import { CreditCardPaymentDTO } from './dto/credit-card-payment.dto';
 
 @Controller('credit-card-expense')
 export class CreditCardExpenseController {
@@ -39,6 +40,30 @@ export class CreditCardExpenseController {
   @Get('/generator/:id')
   findGenerator(@Param('id') id: string, @CurrentUser() user: IUserPayload) {
     return this.creditCardExpenseService.findGenerator(id, user.id);
+  }
+
+  @Post('/invoicePayment')
+  creditCardInvoicePayment(
+    @Body() creditCardPaymentDTO: CreditCardPaymentDTO,
+    @CurrentUser() user: IUserPayload,
+  ) {
+    return this.creditCardExpenseService.monthPaymentInvoice(
+      creditCardPaymentDTO.monthYear,
+      user.id,
+      creditCardPaymentDTO.creditCardId,
+    );
+  }
+
+  @Post('/monthPayment')
+  creditCardMonthPayment(
+    @Body() creditCardPaymentDTO: CreditCardPaymentDTO,
+    @CurrentUser() user: IUserPayload,
+  ) {
+    return this.creditCardExpenseService.monthPaymentInvoice(
+      creditCardPaymentDTO.monthYear,
+      user.id,
+      creditCardPaymentDTO.creditCardId,
+    );
   }
 
   @Get()
