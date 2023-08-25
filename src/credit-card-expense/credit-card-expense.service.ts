@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { addMonths, startOfDay } from 'date-fns';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCreditCardExpenseDto } from './dto/create-credit-card-expense.dto';
 import { UpdateCreditCardExpenseDto } from './dto/update-credit-card-expense.dto';
+import { EarlyPaymentDiscountDto } from './dto/early-payment-discount-credit-card.dto';
 
 @Injectable()
 export class CreditCardExpenseService {
@@ -174,7 +175,6 @@ export class CreditCardExpenseService {
     userId: string,
     creditCardId?: string,
   ) {
-    console.log('teste');
     /* 
       Se creditCardId for fornecido, a lógica será obter o dia de fechamento desse cartão, que será igual a
       data da fatura do expense (invoiceDay) 
@@ -228,6 +228,67 @@ export class CreditCardExpenseService {
         paidOut: true,
       },
     });
+  }
+
+  async earlyPaymentInstallments(
+    earlyPaymentDiscountDto: EarlyPaymentDiscountDto,
+    userId: string,
+  ) {
+    const { creditCardExpenseGeneratorId, totalDiscount } =
+      earlyPaymentDiscountDto;
+
+    const generator =
+      await this.prisma.creditCardExpenseGenerator.findFirstOrThrow({
+        where: { id: creditCardExpenseGeneratorId, userId },
+      });
+
+    if (
+      generator.resolved ||
+      generator.earlyPaymentDiscount ||
+      generator.paymentEndDate < new Date()
+    ) {
+      throw new ConflictException('Generator already anticipated.');
+    }
+
+    const installmentsToUpdate = await this.prisma.creditCardExpense.findMany({
+      where: {
+        creditCardExpenseGeneratorId,
+        userId,
+        paidOut: false,
+      },
+    });
+
+    const updatedInstallments = await Promise.all(
+      installmentsToUpdate.map(async (installment) => {
+        const updatedValue =
+          installment.value - totalDiscount / installmentsToUpdate.length;
+
+        return this.prisma.creditCardExpense.update({
+          where: { id: installment.id },
+          data: { value: updatedValue, anticipated: true, paidOut: true },
+        });
+      }),
+    );
+
+    // Criar novas parcelas adiadas com desconto
+    const newGenerator = await this.prisma.creditCardExpenseGenerator.update({
+      data: {
+        totalValue: generator.totalValue - totalDiscount,
+        earlyPaymentDiscount: totalDiscount,
+        name: generator.name + ` (Adiado)`,
+        paymentEndDate: new Date(), // Defina a nova data de pagamento aqui
+        resolved: true,
+      },
+      where: {
+        id: creditCardExpenseGeneratorId,
+        userId,
+      },
+    });
+
+    return {
+      newGenerator,
+      updatedInstallments,
+    };
   }
 
   private generateInstallmentByGenerator(

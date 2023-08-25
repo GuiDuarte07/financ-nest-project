@@ -14,6 +14,7 @@ import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { IUserPayload } from 'src/user/interfaces/user';
 import { FindCreditCardExpenseDTO } from './dto/find-credit-card-expense.dto';
 import { CreditCardPaymentDTO } from './dto/credit-card-payment.dto';
+import { EarlyPaymentDiscountDto } from './dto/early-payment-discount-credit-card.dto';
 
 @Controller('credit-card-expense')
 export class CreditCardExpenseController {
@@ -63,6 +64,17 @@ export class CreditCardExpenseController {
       creditCardPaymentDTO.monthYear,
       user.id,
       creditCardPaymentDTO.creditCardId,
+    );
+  }
+
+  @Post('/earlyPayment')
+  adiamentoParcelas(
+    @Param('id') userId: string,
+    @Body() earlyPaymentDiscountDto: EarlyPaymentDiscountDto,
+  ) {
+    return this.creditCardExpenseService.earlyPaymentInstallments(
+      earlyPaymentDiscountDto,
+      userId,
     );
   }
 
