@@ -142,8 +142,10 @@ CREATE TABLE "CreditCardRecorrencePurchase" (
     "justForRecord" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
+    "categoryId" TEXT NOT NULL,
     "creditCardId" TEXT,
     "userId" TEXT NOT NULL,
+    CONSTRAINT "CreditCardRecorrencePurchase_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "Category" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT "CreditCardRecorrencePurchase_creditCardId_fkey" FOREIGN KEY ("creditCardId") REFERENCES "CreditCard" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT "CreditCardRecorrencePurchase_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
@@ -162,7 +164,8 @@ CREATE TABLE "RecorrenceBillsProcess" (
     "type" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
-    "startDate" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "categoryId" TEXT NOT NULL,
+    CONSTRAINT "RecorrenceBillsProcess_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "Category" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateIndex
