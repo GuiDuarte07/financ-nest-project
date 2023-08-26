@@ -116,11 +116,6 @@ export class CreditCardExpenseService {
     updateCreditCardExpenseDto: UpdateCreditCardExpenseDto,
     userId: string,
   ) {
-    const newGenerator = await this.prisma.creditCardExpenseGenerator.update({
-      data: { ...updateCreditCardExpenseDto },
-      where: { id: creditCardExpenseGeneratorId, userId },
-    });
-
     const installmentExpenses = await this.prisma.creditCardExpense.findMany({
       where: { creditCardExpenseGeneratorId, userId },
     });
@@ -131,6 +126,21 @@ export class CreditCardExpenseService {
       }
       return count;
     }, 0);
+
+    if (
+      paidOudAmount > 0 &&
+      (updateCreditCardExpenseDto.totalValue ||
+        updateCreditCardExpenseDto.justForRecord)
+    ) {
+      throw new ConflictException(
+        'Não é possível editar ou desconsiderar valor de compra que possui parcela(s) pagas',
+      );
+    }
+
+    const newGenerator = await this.prisma.creditCardExpenseGenerator.update({
+      data: { ...updateCreditCardExpenseDto },
+      where: { id: creditCardExpenseGeneratorId, userId },
+    });
 
     this.prisma.creditCardExpense.deleteMany({
       where: { creditCardExpenseGeneratorId, userId },
