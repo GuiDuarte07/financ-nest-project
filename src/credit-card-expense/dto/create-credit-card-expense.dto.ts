@@ -31,10 +31,6 @@ export class CreateCreditCardExpenseDto {
   @IsDateString()
   purchaseDate?: Date;
 
-  @IsOptional()
-  @IsDateString()
-  invoiceDate?: Date;
-
   @IsUUID()
   creditCardId: string;
 }

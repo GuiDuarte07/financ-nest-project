@@ -16,7 +16,6 @@ export class CreditCardExpenseService {
       Para correções futuras, o invoiceDate (inicio da fatura) pode ser iniciar 1 dia depois
       do fim do vencimento, para ser padronizado, uma vez que o valor sempre cai nesse dia
     */
-    let { invoiceDate } = createCreditCardExpenseDto;
     const { creditCardId, installment } = createCreditCardExpenseDto;
 
     const creditCard = await this.prisma.creditCard.findUniqueOrThrow({
@@ -24,16 +23,40 @@ export class CreditCardExpenseService {
     });
 
     const currentDate = startOfDay(new Date());
+    const closeDate = startOfDay(
+      new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        creditCard.closeDay,
+      ),
+    );
 
-    invoiceDate =
-      invoiceDate ??
-      startOfDay(
+    let invoiceDate: Date;
+    let { purchaseDate } = createCreditCardExpenseDto;
+    if (!purchaseDate) {
+      purchaseDate = new Date();
+    }
+
+    if (purchaseDate.getDate() < closeDate.getDate()) {
+      // Se a compra for antes do dia de fechamento, será cobrada no dia do vencimento do mês seguinte
+      const nextInvoiceMonth = (currentDate.getMonth() + 2) % 12;
+      const nextInvoiceYear =
+        nextInvoiceMonth === 0
+          ? currentDate.getFullYear() + 1
+          : currentDate.getFullYear();
+      invoiceDate = startOfDay(
+        new Date(nextInvoiceYear, nextInvoiceMonth, creditCard.closeDay),
+      );
+    } else {
+      // Caso contrário, será cobrada no dia do vencimento do próximo mês
+      invoiceDate = startOfDay(
         new Date(
           currentDate.getFullYear(),
-          currentDate.getMonth(),
+          (currentDate.getMonth() + 1) % 12,
           creditCard.closeDay,
         ),
       );
+    }
 
     const generator = await this.prisma.creditCardExpenseGenerator.create({
       data: {
@@ -183,61 +206,70 @@ export class CreditCardExpenseService {
   async monthPaymentInvoice(
     monthYear: string /*ex: 08/2023*/,
     userId: string,
-    creditCardId?: string,
+    creditCardId: string,
   ) {
-    /* 
-      Se creditCardId for fornecido, a lógica será obter o dia de fechamento desse cartão, que será igual a
-      data da fatura do expense (invoiceDay) 
-    */
-    if (creditCardId) {
-      const creditCard = await this.prisma.creditCard.findFirstOrThrow({
-        where: { id: creditCardId },
-        select: {
-          closeDay: true,
-        },
+    let monthInvoiceCategory = await this.prisma.category.findFirst({
+      where: { name: 'Month Invoice', type: 'expense', userId },
+    });
+
+    if (!monthInvoiceCategory) {
+      monthInvoiceCategory = await this.prisma.category.create({
+        data: { name: 'Month Invoice', type: 'expense', userId },
       });
+    }
 
-      const currentDate = startOfDay(new Date());
-      const invoiceDate = startOfDay(
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          creditCard.closeDay,
-        ),
-      );
+    const creditCard = await this.prisma.creditCard.findFirstOrThrow({
+      where: { id: creditCardId },
+      select: {
+        closeDay: true,
+        accountId: true,
+        description: true,
+      },
+    });
 
-      return this.prisma.creditCardExpense.updateMany({
+    const [monthStr, yearStr] = monthYear.split('/');
+    const [month, year] = [parseInt(monthStr) - 1, parseInt(yearStr)];
+
+    const invoiceDate = startOfDay(new Date(year, month, creditCard.closeDay));
+
+    const updatedCreditCardExpenses =
+      await this.prisma.creditCardExpense.findMany({
         where: {
           creditCardId,
           userId,
           invoiceDate,
-        },
-        data: {
-          paidOut: true,
+          paidOut: false,
         },
       });
-    }
 
-    /*
-      Se não veio creditCardId, então pega o dia inicial e final do mês fornecido e procura os expenses que o invoiceDay está nesse range.
-    */
-    const [monthStr, yearStr] = monthYear.split('/');
-    const [month, year] = [parseInt(monthStr) - 1, parseInt(yearStr)];
+    const totalValuePaidOut = updatedCreditCardExpenses.reduce(
+      (total, cdExpense) => total + cdExpense.value,
+      0,
+    );
 
-    const from = startOfDay(new Date(year, month, 1));
-    const to = startOfDay(new Date(year, month + 1, 0));
-
-    return this.prisma.creditCardExpense.updateMany({
+    const updates = this.prisma.creditCardExpense.updateMany({
       where: {
-        invoiceDate: {
-          gte: from,
-          lte: to,
-        },
+        creditCardId,
+        userId,
+        invoiceDate,
+        paidOut: false,
       },
       data: {
         paidOut: true,
       },
     });
+
+    const create = this.prisma.expense.create({
+      data: {
+        description: `Pagamento de fatura ${invoiceDate.getMonth}/${invoiceDate.getFullYear} - ${creditCard.description}`,
+        value: totalValuePaidOut,
+        accountId: creditCard.accountId,
+        categoryId: monthInvoiceCategory.id,
+        userId,
+      },
+    });
+
+    return this.prisma.$transaction([updates, create]);
   }
 
   async earlyPaymentInstallments(
@@ -308,7 +340,7 @@ export class CreditCardExpenseService {
       name,
       invoiceDate,
       justForRecord,
-    }: CreateCreditCardExpenseDto,
+    }: CreateCreditCardExpenseDto & { invoiceDate?: Date },
     creditCardExpenseGeneratorId: string,
     userId: string,
     numberOfInstallmentsPaid?: number,
